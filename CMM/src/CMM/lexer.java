@@ -231,8 +231,11 @@ public class lexer {
                     //小数点后无数字，出错
                     if(!isDigit(afterfile[index+1])){
                         //小数点后无数字
+                        tokenStream.add(new token(-2,temp+afterfile[index]));
+                        entrance.tokenError.add(new token(-2," [小数点后不存在数字]"));
+                        ++index;
                         temp = "";
-                        break;
+                        continue;
                     }
                     //合法的小数
                     else{
@@ -281,7 +284,8 @@ public class lexer {
                     }
                     else{
                         //报错
-
+                        tokenStream.add(new token(-1,temp));
+                        entrance.tokenError.add(new token(-1," [非法标识符来源]"));
                     }
                 }
             }
