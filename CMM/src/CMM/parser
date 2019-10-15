@@ -1,0 +1,132 @@
+import java.util.ArrayList;
+
+public class parser {
+    public ArrayList<token> wordList = entrance.tokenStream;
+    public token syn;  //当前的token
+    public int sign = 0;  //记录当前token在wordList中的位置
+
+    //读取下一个token
+    public void nextSyn(){
+        if(sign + 1 < wordList.size()){
+            syn = wordList.get(sign);
+            sign++;
+        }
+    }
+
+    /**
+     * 程序
+     * 返回值0表示分析出错，1表示分析成功
+     */
+    public int program(){
+        int result = 0;
+        if(sign <= wordList.size()){
+            syn = wordList.get(sign);
+        }
+        if(syn.kind == 20){  //“{”，处理语句块
+            result = statements();
+        }
+        else{  //报错，缺少“{”
+            result = 0;
+        }
+        return result;
+    }
+
+    /**
+     * 语句块
+     */
+    public int statements(){
+        int result = 0;
+        nextSyn();
+        if(syn.kind == 6 || syn.kind == 7){  //int或real，声明语句
+
+        }
+        else if(syn.kind == 24){  //变量名ID，赋值语句
+
+        }
+        else if(syn.kind == 5){  //write，输出语句
+
+        }
+        else if(syn.kind == 4){  //read，输入语句
+
+        }
+        else if(syn.kind == 1){  //if语句
+
+        }
+        else if(syn.kind == 3){  //while语句
+
+        }
+        else{  //报错
+
+        }
+        return result;
+    }
+
+    /**
+     * 表达式
+     */
+    public int expression(){
+        int result = 0;
+
+        return result;
+    }
+
+    /**
+     * 声明语句
+     */
+    public int decStatement(){
+        int result = 0;
+
+        return result;
+    }
+
+    /**
+     * 赋值语句
+     */
+    public int assStatement(){
+        int result = 0;
+
+        return result;
+    }
+
+    /**
+     * 输出语句
+     */
+    public int writeStatement(){
+        int result = 0;
+
+        return result;
+    }
+
+    /**
+     * 输入语句
+     */
+    public int readStatement(){
+        int result = 0;
+
+        return result;
+    }
+
+    /**
+     * if语句
+     */
+    public int ifStatement(){
+        int result = 0;
+
+        return result;
+    }
+
+    /**
+     * while语句
+     */
+    public int whileStatement(){
+        int result = 0;
+
+        return result;
+    }
+
+    public int array(){
+        int result = 0;
+
+        return result;
+    }
+}
