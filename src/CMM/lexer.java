@@ -274,7 +274,7 @@ public class lexer {
                     temp ="";
                     index++;
 
-                    tokenStream.add(new token(nt+8,divide[nt],line));
+                    tokenStream.add(new token(nt+17,divide[nt],line));
                     continue;
                 }
                 //运算符号
@@ -289,7 +289,7 @@ public class lexer {
                     {
                         //是运算符号
                         nt = isOperator(temp);
-                        tokenStream.add(new token(nt+17,operator[nt],line));
+                        tokenStream.add(new token(nt+8,operator[nt],line));
                     }
                     else{
                         //报错
