@@ -240,7 +240,13 @@ public class lexer {
                 if(dotNum==0)
                 {
                     //整数
-                    tokenStream.add(new token(25,temp,line));
+                    if(temp.charAt(0) == '0'&& temp.length()!=1)
+                    {
+                        tokenStream.add(new token(-6,temp,line));
+                        entrance.tokenError.add(new token(-6," [整数首位有多余的0]",line));
+                    }
+                    else
+                        tokenStream.add(new token(25,temp,line));
                 }
                 else if(dotNum==1)
                 {
@@ -251,8 +257,13 @@ public class lexer {
                     }
                     else
                     {
-                        //小数
-                        tokenStream.add(new token(26,temp,line));
+                        if(temp.charAt(0)=='0'&&temp.charAt(1) != '.')
+                        {
+                            tokenStream.add(new token(-7,temp,line));
+                            entrance.tokenError.add(new token(-7," [小数首位有多余的0]",line));
+                        }
+                        else
+                            tokenStream.add(new token(26,temp,line));   //小数
                     }
                 }
                 else
@@ -300,17 +311,17 @@ public class lexer {
                             if(temp.equals("*/"))
                             {
                                 //只有右注释
-                                tokenStream.add(new token(-7,temp,line));
-                                entrance.tokenError.add(new token(-7," [块注释缺少/*]",line));
+                                tokenStream.add(new token(-9,temp,line));
+                                entrance.tokenError.add(new token(-9," [块注释缺少/*]",line));
                             }else if(temp.equals("/*"))
                             {
                                 //只有左注释
-                                tokenStream.add(new token(-8,temp,line));
-                                entrance.tokenError.add(new token(-8," [块注释缺少*/]",line));
+                                tokenStream.add(new token(-10,temp,line));
+                                entrance.tokenError.add(new token(-10," [块注释缺少*/]",line));
                             }
                             else{
-                                tokenStream.add(new token(-6,temp,line));
-                                entrance.tokenError.add(new token(-6," [非法运算符]",line));
+                                tokenStream.add(new token(-8,temp,line));
+                                entrance.tokenError.add(new token(-8," [非法运算符]",line));
                             }
                         }
                         else if(afterfile[index]=='.')
