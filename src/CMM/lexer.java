@@ -335,7 +335,7 @@ public class lexer {
                                 {
                                     //单纯一个.
                                     tokenStream.add(new token(-4,temp,line));
-                                    entrance.tokenError.add(new token(-4," [单独一个小数点(.)无意义]",line));
+                                    entrance.tokenError.add(new token(-4," [只有小数点(.)无意义]",line));
                                 }
                                 else
                                 {
