@@ -1,13 +1,11 @@
 package CMM;
 import java.io.BufferedReader;
 import java.io.IOException;
-//import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 
-//import CMM.token;
 public class lexer {
     //存储源程序的字符串 存储结构
 
@@ -67,7 +65,7 @@ public class lexer {
     public static final int VAL_INT = 25;	//int值
     public static final int VAL_REAL= 26;	//real值
 
-    //关键字的判断
+    //关键字的判断（哪个关键字也要知道）
     int isKey(String str){
         int index = -1;
         for(int i = 0;i < keyword.length;i++)
@@ -96,7 +94,7 @@ public class lexer {
         else
             return false;
     }
-    //判断是否为操作符号
+    //判断是否为操作符号（哪个操作符号也要知道）
     int isOperator(String str){
         int index = -1;
         for(int i=0;i<operator.length;i++)
@@ -110,7 +108,7 @@ public class lexer {
         return index;
 
     }
-    //判断是否为界限符号
+    //判断是否为界限符号（哪个界限符号也要知道）
     public int isDivide(String str){
         int index = -1;
         for(int i = 0;i < divide.length;i++)
@@ -140,9 +138,8 @@ public class lexer {
         }
         return result.toString();
     }
-    //对文本的预处理
     //对文本进行预处理
-    public  char[] preLexer(char[] sourcefile)
+    public  char[] preLexer(char[] sourcefile)  //其后还保留了空格
     {
         char []afterfile = new char[10000];
         int index=0;
@@ -166,12 +163,19 @@ public class lexer {
                         if(i==(sourcefile.length-1))
                         {
                             System.out.println("注释有误，未找到注释尾");
+                            //此处记录一个错误
+                            afterfile[index] = '/';
+                            ++index;
+                            afterfile[index] = '*';
+                            ++index;
+                            afterfile[index] = '\0';
                             return afterfile;
                         }
                     }
                     i=i+2;
                 }
-                if(sourcefile[i]!='\n'&&sourcefile[i]!='\r'&&sourcefile[i]!='\t')
+                //if(sourcefile[i]!='\n'&&sourcefile[i]!='\r'&&sourcefile[i]!='\t')
+                if(sourcefile[i]!='\t'&&sourcefile[i]!='\r')
                 {
                     afterfile[index]=sourcefile[i];
                     index++;
@@ -192,9 +196,13 @@ public class lexer {
         //给token赋值
         int nt;
         //扫描器
+        int line = 0;
         while (afterfile[index] != '\0'){
+            if((afterfile[index] =='\r')||(afterfile[index] == '\n')) {
+                ++line;
+            }
             //开头是_或字母可能是保留字或者是标识符
-            if((isLetter(afterfile[index]))||(afterfile[index]=='_'))
+            else if((isLetter(afterfile[index]))||(afterfile[index]=='_'))
             {
                 temp+=afterfile[index];
                 //当下一个字符不为字母或数字，则停止扫描，并将扫描结果存入temp
@@ -208,48 +216,63 @@ public class lexer {
                 {
                    //是关键字
                     nt = isKey(temp);
-                    tokenStream.add(new token(nt+1,keyword[nt]));
+                    tokenStream.add(new token(nt+1,keyword[nt],line));
                 }
                 else {
                     //是标识符
-                    tokenStream.add(new token(24,temp));
+                    tokenStream.add(new token(24,temp,line));
                 }
             }
             //开头是数字时候，小数或者整数
             else if(isDigit(afterfile[index]))
             {
                 temp += afterfile[index];
-                while(isDigit(afterfile[index+1]))
+                int dotNum = 0;
+                while(isDigit(afterfile[index+1])||afterfile[index+1]=='.')
                 {
+                    if(afterfile[index+1]=='.')
+                    {
+                        ++dotNum;
+                    }
                     index++;
                     temp+=afterfile[index];
                 }
-                //存在.时候，继续判断
-                if(afterfile[index+1]=='.')
+                if(dotNum==0)
                 {
-                    index++;
-                    //小数点后无数字，出错
-                    if(!isDigit(afterfile[index+1])){
-                        //小数点后无数字
-                        temp = "";
-                        break;
+                    //整数
+                    if(temp.charAt(0) == '0'&& temp.length()!=1)
+                    {
+                        tokenStream.add(new token(-6,temp,line));
+                        entrance.tokenError.add(new token(-6," [整数首位有多余的0]",line));
                     }
-                    //合法的小数
-                    else{
-                        temp += afterfile[index];
-                        while(isDigit(afterfile[index+1]))
+                    else
+                        tokenStream.add(new token(25,temp,line));
+                }
+                else if(dotNum==1)
+                {
+                    if(afterfile[index]=='.')
+                    {
+                        tokenStream.add(new token(-2,temp,line));
+                        entrance.tokenError.add(new token(-2," [小数点后不存在数字]",line));
+                    }
+                    else
+                    {
+                        if(temp.charAt(0)=='0'&&temp.charAt(1) != '.')
                         {
-                            index++;
-                            temp+=afterfile[index];
+                            tokenStream.add(new token(-7,temp,line));
+                            entrance.tokenError.add(new token(-7," [小数首位有多余的0]",line));
                         }
-                        //检测为小数
-                        tokenStream.add(new token(26,temp));
+                        else
+                            tokenStream.add(new token(26,temp,line));   //小数
                     }
                 }
-                else//为整数
+                else
                 {
-                    tokenStream.add(new token(25,temp));
+                    //存在多于一个的.
+                    tokenStream.add(new token(-3,temp,line));
+                    entrance.tokenError.add(new token(-3," [存在超过一个的小数点]",line));
                 }
+
             }
             //界限符号和运算符号(跳过空格)
             else if(afterfile[index]!=' ')
@@ -262,31 +285,106 @@ public class lexer {
                     temp ="";
                     index++;
 
-                    tokenStream.add(new token(nt+8,divide[nt]));
+                    tokenStream.add(new token(nt+17,divide[nt],line));
                     continue;
                 }
                 //运算符号
                 else{
-                    //双目运算符号
-                    if(afterfile[index+1]=='>'||afterfile[index+1]=='=')
+                    //双目运算符号 非法的判断
+                    if(isOperator(""+afterfile[index+1])>0)
                     {
-                        index++;
+                        ++index;
                         temp+=afterfile[index];
                     }
                     if(isOperator(temp)!=-1)
                     {
                         //是运算符号
                         nt = isOperator(temp);
-                        tokenStream.add(new token(nt+17,operator[nt]));
+                        tokenStream.add(new token(nt+8,operator[nt],line));
                     }
                     else{
                         //报错
-
+                        //非法的标识符号或运算符
+                        if(isOperator(""+afterfile[index])>0||isOperator(""+afterfile[index-1])>0)
+                        {
+                            //非法的运算符号
+                            if(temp.equals("*/"))
+                            {
+                                //只有右注释
+                                tokenStream.add(new token(-9,temp,line));
+                                entrance.tokenError.add(new token(-9," [块注释缺少/*]",line));
+                            }else if(temp.equals("/*"))
+                            {
+                                //只有左注释
+                                tokenStream.add(new token(-10,temp,line));
+                                entrance.tokenError.add(new token(-10," [块注释缺少*/]",line));
+                            }
+                            else{
+                                tokenStream.add(new token(-8,temp,line));
+                                entrance.tokenError.add(new token(-8," [非法运算符]",line));
+                            }
+                        }
+                        else if(afterfile[index]=='.')
+                        {
+                            int numCount = 0;
+                            int letterCount = 0;
+                            int dotCount = 0;
+                            while(isLetter(afterfile[index+1])||isDigit(afterfile[index+1])||afterfile[index+1]=='.')
+                            {
+                                if(isLetter(afterfile[index+1]))
+                                    ++letterCount;
+                                if(isDigit(afterfile[index+1]))
+                                    ++numCount;
+                                if(afterfile[index+1]=='.')
+                                    ++dotCount;
+                                ++index;
+                                temp+=afterfile[index];
+                            }
+                            if(letterCount==0)
+                            {
+                                if(numCount==0)
+                                {
+                                    //单纯一个.
+                                    tokenStream.add(new token(-4,temp,line));
+                                    entrance.tokenError.add(new token(-4," [只有小数点(.)无意义]",line));
+                                }
+                                else
+                                {
+                                    if(dotCount>0)
+                                    {
+                                        //存在多个.
+                                        tokenStream.add(new token(-3,temp,line));
+                                        entrance.tokenError.add(new token(-3," [存在超过一个的小数点]",line));
+                                    }
+                                    else
+                                    {
+                                        //.前无数字
+                                        tokenStream.add(new token(-5,temp,line));
+                                        entrance.tokenError.add(new token(-5," [小数点(.)前无数字]",line));
+                                    }
+                                }
+                            }else
+                            {
+                                //非法的标识符
+                                tokenStream.add(new token(-1,temp,line));
+                                entrance.tokenError.add(new token(-1," [非法标识符]",line));
+                            }
+                        }else
+                        {
+                            //非法的标识符号
+                            while(!(isDivide(afterfile[index+1]+"")>-1)&&!(isOperator(afterfile[index+1]+"")>0)&&!(isOperator(afterfile[index+1]+afterfile[index+2]+"")>0))
+                            {
+                                ++index;
+                                temp+=afterfile[index];
+                            }
+                            tokenStream.add(new token(-1,temp,line));
+                            entrance.tokenError.add(new token(-1," [非法标识符]",line));
+                        }
                     }
                 }
             }
             temp="";
-            index++;
+            ++index;
         }
         return tokenStream;
     }

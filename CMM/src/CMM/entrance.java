@@ -4,20 +4,19 @@ import CMM.token;
 import java.io.*;
 import java.util.ArrayList;
 
-import CMM.lexer;
+import CMM.parser;
 
 public class entrance {
     public static ArrayList<token> tokenStream = new ArrayList<token>();
+    public static ArrayList<token> tokenError = new ArrayList<>();  //错误的词素
     public static void main(String[] args){
 
-        //cFrame f = new cFrame();
-        //展示界面
-        //f.display();
+        //1.词法分析开始
 
-        //词法分析开始
         lexer le = new lexer();
+
+        //源文件的txt的处理
         String pathname = "src/cmmtest.txt";
-        //源文件的txt
         File file = new File(pathname);
         //txt 转换为 字符数组
         String source = "";
@@ -30,14 +29,34 @@ public class entrance {
         char sourcefile[] = source.toCharArray();
         //预处理 去掉注释等
         char afterfile[] = le.preLexer(sourcefile);
-        //System.out.println(afterfile);
-        //开始分析
+        System.out.println(afterfile);
+//        System.out.println("!!!");
+//        System.out.println(afterfile[4]);
+//        System.out.println("!!!");
+        //开始词法分析
         tokenStream = le.analyze(afterfile);
+        int tempError = 0;
         for(int i = 0;i < tokenStream.size();i++)
         {
-            System.out.print(tokenStream.get(i).kind+"\t");
-            System.out.println(tokenStream.get(i).content);
+            int w = tokenStream.get(i).kind;
+            if(w<0)
+                System.out.print("Error("+w+")"+"\t");
+            else
+                System.out.print(w+"\t\t\t");
+            System.out.print(tokenStream.get(i).content+"\t\t\t");
+            System.out.print(tokenStream.get(i).line);
+            if(w<0)
+            {
+                System.out.println(tokenError.get(tempError).content);
+                ++tempError;
+            }
+            else
+                System.out.println();
         }
+        //语法分析开始
+        System.out.println("\n语法分析开始：\n");
+        parser par = new parser();
+        int res = par.program();
     }
 
 }

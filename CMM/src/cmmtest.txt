@@ -1,9 +1,9 @@
 {
-	int i = 6;
+	int i = 1;
 	int w;
 	if(i){
 		w = 0;
-	}
+	
 	else
 	{
 		w = 1.5;
