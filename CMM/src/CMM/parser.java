@@ -27,6 +27,19 @@ public class parser {
         if(syn.kind == 20){  //“{”，处理语句块
             System.out.println("<程序> -> {<语句块>}");
             result = statements();
+            if(result == 1)
+            {
+                if(syn.kind != 21)
+                {
+                    result = 0;
+                    System.out.println(syn.line+"行的"+syn.content+"应该替换为 } 以与程序开头的 { 匹配！");
+                }
+                if(sign != (wordList.size()-1))
+                {
+                    result = 0;
+                    System.out.println("程序{}体外存在无用的信息");
+                }
+            }
         }
         else{  //报错，缺少“{”
             result = 0;
