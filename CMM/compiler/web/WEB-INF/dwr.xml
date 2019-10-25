@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 1.0//EN" "http://www.getahead.ltd.uk/dwr/dwr10.dtd">
+<dwr>
+    <allow>
+        <create creator="new" javascript="HelloDwr">
+            <param name="class" value="test.action.testdwr">
+            </param>
+        </create>
+        <create creator="new" javascript="Word">
+            <param name="class" value="test.action.entrance">
+            </param>
+        </create>
+    </allow>
+</dwr>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/jiemian.css">
+    <link rel="stylesheet" href="cssgjl/font-awesome.css">
+    <link rel="stylesheet" href="cssgjl/maps.css">
+    <link rel="stylesheet" href="cssgjl/zzsc.css">
+    <link rel="stylesheet" href="css/jiemian.css">
+    <link rel="stylesheet" href="css/normalize.css">
+
+
+    <link rel="stylesheet" href="css/style.css" media="screen" type="text/css">
+    <script type="text/javascript" src="jsgjl/maps.js"></script>
+    <script type="text/javascript" src="jsgjl/google.js"></script>
+    <script type="text/javascript" src="js/bc.js"></script>
+    <script type='text/javascript' src='./dwr/engine.js'></script>
+    <script type='text/javascript' src='./dwr/interface/Word.js'></script>
+    <script type='text/javascript' src='./dwr/util.js'></script>
+    <!--		<script src="../js/jQuery/jquery-1.11.1.js"></script>-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $().maps();
+        });
+    </script>
+
+    <title>解释器</title>
+</head>
+<body>
+<div style="text-align:center;clear:both">
+    <!--			<script src="/gg_bd_ad_720x90.js" type="text/javascript"></script>-->
+    <!--			<script src="/follow.js" type="text/javascript"></script>-->
+</div>
+<div class="content">
+    <ul class="venus-menu">
+        <li><a href="#"><i class="icon-thumbs-up"></i>文件</a>
+            <ul>
+                <li><a href="#">打开</a></li>
+                <li><a href="#">新建</a></li>
+                <li><a onclick="baocun()">保存</a></li>
+            </ul>
+        </li>
+
+        <li><a onclick="xieru()">新建</a></li>
+
+        <li><a onclick="openfile()">打开文件</a>
+        </li>
+
+        <input type="hidden" id="theFilePath" name="theFilePath" value="">
+
+        <li><a onclick="anaysiscall()">词法语法分析</a></li>
+
+        <li class="search">
+            <form method="get">
+                <input type="text" name="search" class="search" placeholder="Search">
+            </form>
+        </li>
+    </ul>
+
+</div>
+
+<div class="oDiv" id="iDiv">
+			<textarea class="wbk1" type="text" id="resulttext">
+			</textarea>
+</div>
+
+<div><textarea class="wbk2" type="text" id="filetext"></textarea></div>
+
+<script src="js/index.js"></script>
+
+<script>
+    //方法一
+    $("#fileImport").click(function () {
+        $("#files").click();
+    });
+
+
+    function fileImport() {
+        //获取读取我文件的File对象
+        var selectedFile = document.getElementById('files').files[0];
+        //读取选中文件的大小
+        var name = selectedFile.name; //读取选中文件的文件名
+        var size = selectedFile.size; //读取选中文件的大小
+
+        var reader = new FileReader(); //这是核心,读取操作就是由它完成.
+        text = reader.readAsText(selectedFile);
+        reader.onload = function () {
+            //当读取完成后回调这个函数,然后此时文件的内容存储到了result中,直接操作即可
+            document.getElementById('wbkcw').value = text;
+        }
+    }
+
+    function open() {
+        var fileobj = document.getElementById('choosefile').files[0];
+        var name = fileobj.name;
+        var reader = new FileReader();
+        reader.readAsText(fileobj);
+        reader.onload = function () {
+            document.getElementById('filetext').innerHTML = reader.result;
+        };
+    }
+
+    function choose() {
+        var inputObj = document.createElement('input');
+        inputObj.setAttribute('id', 'choosefile');
+        inputObj.setAttribute('type', 'file');
+        inputObj.setAttribute("style", 'visibility:hidden');
+        inputObj.setAttribute('onchange','tran(this.value)');
+        document.body.appendChild(inputObj);
+        inputObj.click();
+    }
+
+    function tran(path) {
+     alert(path);
+    }
+
+    function openfile() {
+        choose();
+        open();
+    }
+
+    function anaysiscall() {
+        Word.compile(anaysiscallback);
+    }
+
+    function anaysiscallback(data) {
+        document.getElementById('resulttext').innerHTML = data;
+    }
+
+
+    function load(name) {
+        var xhr = new XMLHttpRequest(),
+            okStatus = document.location.protocol === "file:" ? 0 : 200;
+        xhr.open('GET', name, false);
+        xhr.overrideMimeType("text/html;charset=utf-8"); //默认为utf-8
+        xhr.send(null);
+        return xhr.status === okStatus ? xhr.responseText : null;
+    }
+
+    function xieru() {
+        var tex = load("1111.txt");
+        document.getElementById('wbkdm').value = tex;
+    }
+
+    function download(filename, text) {
+        var pom = document.createElement("a");
+        pom.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+        pom.setAttribute("download", filename);
+        if (document.createEvent) {
+            var event = document.createEvent("MouseEvents");
+            event.initEvent("click", true, true);
+            pom.dispatchEvent(event);
+        } else {
+            pom.click();
+        }
+    }
+
+    function baocun() {
+        var dm = document.getElementById('').value;
+        download(name, dm)
+    }
+</script>
+</body>
+</html>
