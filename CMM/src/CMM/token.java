@@ -13,4 +13,16 @@ public class token {
         this.content = con;
         this.line = line;
     }
+    //CHEN
+    public token(token a )
+    {
+        this.content = a.content;
+        this.kind = a.kind;
+        this.line = a.line;
+    }
+
+    public token()
+    {
+
+    }
 }

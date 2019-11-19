@@ -320,8 +320,40 @@ public class lexer {
                                 entrance.tokenError.add(new token(-10," [块注释缺少*/]",line));
                             }
                             else{
-                                tokenStream.add(new token(-8,temp,line));
-                                entrance.tokenError.add(new token(-8," [非法运算符]",line));
+                                if(temp.equals("/-")||temp.equals("/+")||temp.equals("*-")||temp.equals("*+")||temp.equals("--")||temp.equals("-+")||temp.equals("+-")||temp.equals("++"))
+                                {
+                                    //tokenStream.add(new token(11,"/",line));
+                                    String complex1 = temp.charAt(0)+"";
+                                    if(complex1.equals("/")){
+                                        tokenStream.add(new token(11,"/",line));
+                                    }else if(complex1.equals("*"))
+                                    {
+                                        tokenStream.add(new token(10,"*",line));
+                                    }else if(complex1.equals("-"))
+                                    {
+                                        tokenStream.add(new token(9,"-",line));
+                                    }else if(complex1.equals("+"))
+                                    {
+                                        tokenStream.add(new token(8,"+",line));
+                                    }
+                                    String complex2 = temp.substring(1);
+                                    if(complex2.equals("-"))
+                                    {
+                                        tokenStream.add(new token(9,complex2,line));
+                                    }else if(complex2.equals("+"))
+                                    {
+                                        tokenStream.add(new token(8,complex2,line));
+                                    }
+
+//                                    tokenStream.add(new token(-8,temp.substring(0),line));
+//                                    tokenStream.add(new token(-8,temp.substring(1),line));
+                                    //entrance.tokenError.add(new token(-8," [非法运算符]",line));
+
+                                }else
+                                {
+                                    tokenStream.add(new token(-8,temp,line));
+                                    entrance.tokenError.add(new token(-8," [非法运算符]",line));
+                                }
                             }
                         }
                         else if(afterfile[index]=='.')
